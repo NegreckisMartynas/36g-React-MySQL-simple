@@ -1,0 +1,30 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+table, th{
+  border: 1px solid gray;
+  border-collapse: collapse;
+  margin: 0 16px;
+}
+
+td {
+  border: 1px solid lightgray;
+}
+
+th, td {
+  padding: 0 16px;
+}
