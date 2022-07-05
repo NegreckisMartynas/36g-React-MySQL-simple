@@ -37,6 +37,7 @@ const Row = (element, i) => (
     <tr key={i}>
         <td>{element.author_id}</td>
         <td>{element.name}</td>
+        <td>{element.books.join(' 🞄 ')}</td>
     </tr>
 )
 
