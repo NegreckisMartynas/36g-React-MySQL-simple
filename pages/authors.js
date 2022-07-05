@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Books() {
+export default function Authors() {
     return (
         <div>
             <Title></Title>
@@ -21,9 +21,7 @@ const Table = () => {
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Pavadinimas</th>
-                    <th>Žanras</th>
-                    <th>Parašymo metai</th>
+                    <th>Vardas</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,15 +35,13 @@ const Title = () => <h1>Mano knygos</h1>
 
 const Row = (element, i) => (
     <tr key={i}>
-        <td>{element.book_id}</td>
-        <td>{element.title}</td>
+        <td>{element.author_id}</td>
         <td>{element.name}</td>
-        <td>{element.release_year}</td>
     </tr>
 )
 
 async function getData() {
-    const result = await fetch('/api/books').then(res => res.json());
+    const result = await fetch('/api/authors').then(res => res.json());
     console.log(result[0])
     return result;
 }
