@@ -21,10 +21,23 @@ table, th{
   margin: 0 16px;
 }
 
+table {
+  margin-bottom: 20px
+}
+
 td {
   border: 1px solid lightgray;
 }
 
 th, td {
+  padding: 0 16px;
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+}
+
+.pager span {
   padding: 0 16px;
 }

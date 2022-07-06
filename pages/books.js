@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
 
 export default function Books() {
+    const [data, setData] = useState([]);
+    const [page, setPage] = useState(1)
+    
+    useEffect(() => {
+        getData(page).then(d => setData(d));
+    }, [])
+
+    const changePage = (p) => {
+        setPage(p);
+        getData(p).then(d => setData(d))
+    }
+
     return (
         <div>
             <Title></Title>
-            <Table></Table>
+            <Table data={data}></Table>
+            <Pager page={page} setPage={changePage}></Pager>
         </div>
     )
 }
 
-const Table = () => {
-    const [data, setData] = useState([]);
-    
-    useEffect(() => {
-        getData().then(d => setData(d));
-    }, [])
-
+const Table = (props) => {
     return (
         <table>
             <thead>
@@ -27,7 +34,7 @@ const Table = () => {
                 </tr>
             </thead>
             <tbody>
-                {data.map(Row)}
+                {props.data.map(Row)}
             </tbody>
         </table>
     );
@@ -44,8 +51,18 @@ const Row = (element, i) => (
     </tr>
 )
 
-async function getData() {
-    const result = await fetch('/api/books').then(res => res.json());
+const Pager = (props) => {
+    return (
+        <div className="pager">
+            <button onClick={()=>props.setPage(props.page-1)}>&lt;</button>
+            <span>{props.page}</span>
+            <button onClick={()=>props.setPage(props.page+1)}>&gt;</button>
+        </div>
+    )
+}
+
+async function getData(page) {
+    const result = await fetch(`/api/books?page=${page}`).then(res => res.json());
     console.log(result[0])
     return result;
 }
