@@ -35,14 +35,30 @@ export default function Books() {
         dialog.current.show()
     }
 
+    const deleteElement = (element) => {
+        const result = confirm(`Ar tikrai norite ištrinti "${element.title}"`);
+        if(result) {
+            fetch('/api/books/delete', {
+                method: 'DELETE',
+                body: element.book_id
+            }).then(() => {
+                changePage(page);
+            })
+        }
+    }
+
     const EditButton = (params) => (
         <button onClick={() => showEditDialog(params)}>Edit</button>
+    )
+
+    const DeleteButton = (params) => (
+        <button onClick={() => deleteElement(params)}>Delete</button>
     )
 
     return (
         <div>
             <Title></Title>
-            <Table data={data} editButton={EditButton}></Table>
+            <Table data={data} editButton={EditButton} deleteButton={DeleteButton}></Table>
             <Pager page={page} setPage={changePage}></Pager>
             <EditDialog
                 dialogRef={instance => dialog.current = instance}
@@ -51,7 +67,6 @@ export default function Books() {
                 title="editBook">
                 {editContent}
             </EditDialog>
-            
         </div>
     )
 }
@@ -68,7 +83,7 @@ const Table = (props) => {
                 </tr>
             </thead>
             <tbody>
-                {props.data.map((e, i) => Row(e, i, [props.editButton]))}
+                {props.data.map((e, i) => Row(e, i, [props.editButton, props.deleteButton]))}
             </tbody>
         </table>
     );
@@ -84,7 +99,7 @@ const Row = (element, i, buttons) => (
         <td>{element.release_year}</td>
         <td>
             {buttons[0](element)}
-            <button>Delete</button>
+            {buttons[1](element)}
         </td>
     </tr>
 )
