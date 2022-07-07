@@ -4,11 +4,13 @@ import { A11yDialog } from 'react-a11y-dialog'
 export default function Books() {
     const [data, setData] = useState([]);
     const [page, setPage] = useState(1);
+    const [genres, setGenres] = useState([]);
     const [editContent, setEditContent] = useState(null);
     const dialog = React.useRef();
     
     useEffect(() => {
         getData(page).then(d => setData(d));
+        getGenres().then(d => setGenres(d));
     }, [])
 
     const changePage = (p) => {
@@ -28,6 +30,14 @@ export default function Books() {
                 <div key={entry.release_year}>
                     <label htmlFor="year_input">Parašymo metai: </label>
                     <input id="year_input" type="number" name="release_year" defaultValue={entry.release_year ?? ''}/>
+                </div>
+                <div key={'genre_'+entry.genre_id}>
+                    <label htmlFor="genre_input">Parašymo metai: </label>
+                    <select id="genre_input" name="genre">
+                        {genres.map(genre => (
+                            <option value={genre.genre_id} selected={genre.genre_id === entry.genre_id}>{genre.name}</option>
+                        ))}
+                    </select>
                 </div>
                 <button type="submit">Išsaugoti</button>
             </div>
@@ -76,7 +86,6 @@ const Table = (props) => {
         <table>
             <thead>
                 <tr>
-                    <th>Id</th>
                     <th>Pavadinimas</th>
                     <th>Žanras</th>
                     <th>Parašymo metai</th>
@@ -93,9 +102,8 @@ const Title = () => <h1>Mano knygos</h1>
 
 const Row = (element, i, buttons) => (
     <tr key={i}>
-        <td>{element.book_id}</td>
         <td>{element.title}</td>
-        <td>{element.name}</td>
+        <td>{element.genre}</td>
         <td>{element.release_year}</td>
         <td>
             {buttons[0](element)}
@@ -116,6 +124,12 @@ const Pager = (props) => {
 
 async function getData(page) {
     const result = await fetch(`/api/books?page=${page}`).then(res => res.json());
+    console.log(result[0])
+    return result;
+}
+
+async function getGenres() {
+    const result = await fetch(`/api/genres`).then(res => res.json());
     console.log(result[0])
     return result;
 }
