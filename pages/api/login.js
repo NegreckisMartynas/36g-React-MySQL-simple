@@ -4,8 +4,6 @@ import connection from '../../utility/connection'
 
 export default async function handler(req, res) {
     const body = JSON.parse(req.body);
-    //const hash = bcrypt.hash(body.password, 12);
-    console.log(body);
     const [data, fields] = await connection.query('SELECT user_id, passwordHash FROM user WHERE email=?', 
                                                 [body.email]);
     const user = data[0];
@@ -19,10 +17,7 @@ export default async function handler(req, res) {
     }
     else{
         //grazinti 400
-        console.log('No match')
+        res.status(400).json({})
     }                                                
-
-    // res.status(200).json({ token: '12345' })
-    res.status(400).json({})
 }
   
