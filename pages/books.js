@@ -5,7 +5,7 @@ export default function Books() {
     const [data, setData] = useState([]);
     const [page, setPage] = useState(1);
     const [genres, setGenres] = useState([]);
-    const [editContent, setEditContent] = useState(null);
+    const [selectedEntry, setEntry] = useState({})
     const dialog = React.useRef();
     
     useEffect(() => {
@@ -14,56 +14,22 @@ export default function Books() {
     }, [])
 
     const changePage = (p) => {
-        console.log('Change page:', p )
         setPage(p);
         getData(p).then(d => setData(d))
     }
 
+    const deleteElement = (entry) => deleteBook(entry, () => changePage(p));
+
     const showEditDialog = (entry) => {
-        setEditContent(
-            <div>
-                <input key={entry.book_id} type="hidden" name="book_id" defaultValue={entry.book_id}></input>
-                <div key={entry.title}>
-                    <label htmlFor="title_input">Pavadinimas: </label>
-                    <input id="title_input" type="text" name="title" defaultValue={entry.title}/>
-                </div>
-                <div key={entry.release_year}>
-                    <label htmlFor="year_input">Parašymo metai: </label>
-                    <input id="year_input" type="number" name="release_year" defaultValue={entry.release_year ?? ''}/>
-                </div>
-                <div key={'genre_'+entry.genre_id}>
-                    <label htmlFor="genre_input">Parašymo metai: </label>
-                    <select id="genre_input" name="genre">
-                        {genres.map(genre => (
-                            <option value={genre.genre_id} selected={genre.genre_id === entry.genre_id}>{genre.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <button type="submit">Išsaugoti</button>
-            </div>
-        )
-        dialog.current.show()
+        setEntry(entry);
+        dialog.current.show();
     }
 
-    const deleteElement = (element) => {
-        const result = confirm(`Ar tikrai norite ištrinti "${element.title}"`);
-        if(result) {
-            fetch('/api/books/delete', {
-                method: 'DELETE',
-                body: element.book_id
-            }).then(() => {
-                changePage(page);
-            })
-        }
-    }
-
-    const EditButton = (params) => (
-        <button onClick={() => showEditDialog(params)}>Edit</button>
+    const Button = (callback, title) => (entry) => (
+        <button onClick={() => callback(entry)}>{title}</button>
     )
-
-    const DeleteButton = (params) => (
-        <button onClick={() => deleteElement(params)}>Delete</button>
-    )
+    const EditButton = Button(showEditDialog, 'Edit');
+    const DeleteButton = Button(deleteElement, 'Delete');
 
     return (
         <div>
@@ -72,10 +38,11 @@ export default function Books() {
             <Pager page={page} setPage={changePage}></Pager>
             <EditDialog
                 dialogRef={instance => dialog.current = instance}
+                genres={genres}
+                entry={selectedEntry}
                 instance={dialog.current}
                 onSubmit={() => changePage(page)}
                 title="editBook">
-                {editContent}
             </EditDialog>
         </div>
     )
@@ -166,14 +133,45 @@ const EditDialog = (props) => {
         })
     }
 
+    const {entry, genres, dialogRef} = props;
+
     return (
         <Dialog id='edit'
-            dialogRef={props.dialogRef}
+            dialogRef={dialogRef}
             title='Edit book'>
             <form method="post" action="/api/books/edit" onSubmit={submit}>
                 <h4>Edit Book</h4>
-                {props.children}
+                <div>
+                    <input key={entry.book_id} type="hidden" name="book_id" defaultValue={entry.book_id}></input>
+                    <div key={entry.title}>
+                        <label htmlFor="title_input">Pavadinimas: </label>
+                        <input id="title_input" type="text" name="title" defaultValue={entry.title}/>
+                    </div>
+                    <div key={entry.release_year}>
+                        <label htmlFor="year_input">Parašymo metai: </label>
+                        <input id="year_input" type="number" name="release_year" defaultValue={entry.release_year ?? ''}/>
+                    </div>
+                    <div key={'genre_'+entry.genre_id}>
+                        <label htmlFor="genre_input">Parašymo metai: </label>
+                        <select id="genre_input" name="genre">
+                            {genres.map(genre => (
+                                <option value={genre.genre_id} selected={genre.genre_id === entry.genre_id}>{genre.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <button type="submit">Išsaugoti</button>
+                </div>
             </form>
         </Dialog>
     )
+}
+
+const deleteBook = (book, onDelete) => {
+    const result = confirm(`Ar tikrai norite ištrinti "${book.title}"`);
+    if(result) {
+        fetch('/api/books/delete', {
+            method: 'DELETE',
+            body: book.book_id
+        }).then(onDelete)
+    }
 }
