@@ -119,19 +119,11 @@ const Dialog = (props) => {
 }
 
 const EditDialog = (props) => {
-    const submit = (event) => {
-        event.preventDefault();
-        const object = {};
-        new FormData(event.target).forEach((value, key) => object[key] = value);
-
-        fetch('/api/books/edit', {
-            method: 'POST',
-            body: JSON.stringify(object)
-        }).then(() => {
-            props.onSubmit();
-            props.instance.hide();
-        })
+    const reloadAndHide = () => {
+        props.onSubmit();
+        props.instance.hide();
     }
+    const submit = ( event ) => submitEditForm(event, reloadAndHide)
 
     const {entry, genres, dialogRef} = props;
 
@@ -164,6 +156,17 @@ const EditDialog = (props) => {
             </form>
         </Dialog>
     )
+}
+
+const submitEditForm = (event, callback) => {
+    event.preventDefault();
+    const formData = {};
+    new FormData(event.target).forEach((value, key) => formData[key] = value);
+
+    fetch('/api/books/edit', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+    }).then(callback)
 }
 
 const deleteBook = (book, onDelete) => {
